@@ -1,25 +1,201 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.34407.143
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "225064164_P25IFM_11", "225064164_P25IFM_11.vbproj", "{3C417FAA-F8D4-4837-987C-F28E6192D5CD}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3C417FAA-F8D4-4837-987C-F28E6192D5CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C417FAA-F8D4-4837-987C-F28E6192D5CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C417FAA-F8D4-4837-987C-F28E6192D5CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C417FAA-F8D4-4837-987C-F28E6192D5CD}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A5CFCF1B-576E-455A-9E10-60858D8B8FA5}
-	EndGlobalSection
-EndGlobal
+' ***************************************************************** 
+' Surname, Initials: MaAKHUBEDU, RM
+' Class name: frmSocialMedia
+' ****************************************************************
+
+Option Strict On
+Option Explicit On
+Option Infer Off
+
+
+Public Class frmSocialMedia
+
+    ' Variable declarations
+    Private nDepartments As Integer
+    Private nPlatforms As Integer
+    Private nPosts As Integer
+    ' Record structure declarations
+    Private Structure PostRec
+        Public ID As String
+        Public likes As Integer
+        Public comments As Integer
+        Public shares As Integer
+
+    End Structure
+
+    Private Structure PlatformRec
+        Public name As String
+        Public posts() As PostRec
+        Public totalEngagements As Integer
+    End Structure
+
+    Private Structure DepartmentRec
+        Public name As String
+        Public platform() As PlatformRec
+        Public aveEngagement As Double
+        Public rating As Integer
+    End Structure
+
+    Private departNum() As DepartmentRec
+
+    Private Sub displayText(ByVal r As Integer, ByVal c As Integer, ByVal t As String)
+        grdMedia.Row = r
+        grdMedia.Col = c
+        grdMedia.Text = t
+    End Sub
+
+
+
+
+
+
+    Private Sub btnSetup_Click(sender As Object, e As EventArgs) Handles btnSetup.Click
+        ' 2.1 capture number of Departments,  Profiles per Department, Posts per Profile 
+        nDepartments = CInt(InputBox("What is the number of departments ? "))
+        nPlatforms = CInt(InputBox("What is the number of platforms ? "))
+        nPosts = CInt(InputBox("What is the number of profiles ? "))
+        ' 2.2 Set up of dynamic arrays
+
+        ReDim departNum(nDepartments)
+        For d As Integer = 1 To nDepartments
+            ReDim departNum(d).platform(nPlatforms)
+            For p As Integer = 1 To nPlatforms
+                ReDim departNum(d).platform(p).posts(nPosts)
+
+            Next p
+
+
+        Next d
+
+        ' 2.3 Set up of the UJGrid control
+        grdMedia.Rows = nDepartments + 1
+        grdMedia.Cols = nPlatforms + 3
+
+        ' 2.4  Labelling of UJGrid headings (Departments as Rows, and Profiles as Columns) 
+        For d As Integer = 1 To nDepartments
+            displayText(d, 0, "Department " & CStr(d))
+        Next d
+        For p As Integer = 1 To nPlatforms
+            displayText(0, p, "Profile " & CStr(p))
+        Next p
+
+        displayText(0, nPlatforms + 1, "Average")
+        displayText(0, nPlatforms + 2, "Rating")
+
+    End Sub
+
+    Private Sub btnInput_Click(sender As Object, e As EventArgs) Handles btnInput.Click
+        '3.1 Input of data for each Department (including information for each Profile and Posts) 
+        For d As Integer = 1 To nDepartments
+            departNum(d).name = InputBox("Whats the name of department " & CStr(d))
+
+            For p As Integer = 1 To nPlatforms
+                departNum(d).platform(p).name = InputBox("Whats the platform name of  platform number " & CStr(p) & " in department number " & CStr(d))
+                For post As Integer = 1 To nPosts
+
+                    departNum(d).platform(p).posts(post).ID = InputBox("Whats the Post Id of post " & CStr(post) & " in platform " & CStr(p) & " in department " & CStr(d))
+                    departNum(d).platform(p).posts(post).likes = CInt(InputBox("Whats the number of likes of post " & CStr(post) & " in platform " & CStr(p) & " in department " & CStr(d)))
+                    departNum(d).platform(p).posts(post).comments = CInt(InputBox("Whats the number of comments of post " & CStr(post) & " in platform " & CStr(p) & " in department " & CStr(d)))
+                    departNum(d).platform(p).posts(post).shares = CInt(InputBox("Whats the number of shares of post " & CStr(post) & " in platform " & CStr(p) & " in department " & CStr(d)))
+
+                Next post
+            Next p
+
+        Next d
+
+
+
+    End Sub
+
+    Private Sub btnTotal_Click(sender As Object, e As EventArgs) Handles btnTotal.Click
+        ' 4.1 Calculation of Total Engagement 
+        For d As Integer = 1 To nDepartments
+
+            For p As Integer = 1 To nPlatforms
+                For post As Integer = 1 To nPosts
+                    departNum(d).platform(p).totalEngagements = departNum(d).platform(p).totalEngagements + CInt(departNum(d).platform(p).posts(post).likes) + CInt(departNum(d).platform(p).posts(post).comments) + CInt(departNum(d).platform(p).posts(post).shares)
+                Next post
+
+                ' 4.2 Display of Total Engagement 
+                displayText(d, p, CStr(departNum(d).platform(p).totalEngagements))
+            Next p
+
+        Next d
+
+
+    End Sub
+
+    Private Sub btnAverage_Click(sender As Object, e As EventArgs) Handles btnAverage.Click
+        ' 5.1 Calculation of Average Engagement 
+        For d As Integer = 1 To nDepartments
+            Dim total As Integer = 0
+
+            For p As Integer = 1 To nPlatforms
+                total += departNum(d).platform(p).totalEngagements
+            Next p
+
+            departNum(d).aveEngagement = total / nPlatforms
+            displayText(d, nPlatforms + 1, Format(departNum(d).aveEngagement, "0.00")) ' 5.2 Display of Average Engagement 
+        Next d
+
+
+    End Sub
+
+    ' 6) Define a function GetRating that accepts one Double parameter called AverageEngagement And returns an Integer rating 
+    Private Function GetRating(ByVal AverageEngagement As Double) As Integer
+        Dim rating As Integer
+
+        If (AverageEngagement > 0 And AverageEngagement < 200) Then
+
+            rating = 1
+
+        End If
+        If (AverageEngagement >= 200 And AverageEngagement < 500) Then
+
+            rating = 2
+        End If
+        If (AverageEngagement >= 500) Then
+
+            rating = 3
+        End If
+
+        Return rating
+    End Function
+
+    Private Sub btnRating_Click(sender As Object, e As EventArgs) Handles btnRating.Click
+
+        For d As Integer = 1 To nDepartments
+            ' 7.1 Calculation of Engagement Rating (using GetRating function) 
+            departNum(d).rating = GetRating(departNum(d).aveEngagement)
+
+            ' 7.2 Display of Engagement Ratings
+            displayText(d, nPlatforms + 2, CStr(departNum(d).rating))
+        Next d
+
+
+    End Sub
+
+    Private Sub btnMaxAverage_Click(sender As Object, e As EventArgs) Handles btnMaxAverage.Click
+        '8.1 Determine Department with highest Average Engagement 6 
+
+        Dim MaxAve As Double = departNum(1).aveEngagement
+        Dim MaxAveIndex As Integer = 1
+
+        For d As Integer = 2 To nDepartments
+            If (MaxAve < departNum(d).aveEngagement) Then
+                MaxAve = departNum(d).aveEngagement
+                MaxAveIndex = d
+            End If
+        Next d
+
+        '8.2 Display Department Name And Rating in textboxes
+        txtMaxAveName.Text = departNum(MaxAveIndex).name
+        txtMaxAveRating.Text = CStr(departNum(MaxAveIndex).rating)
+
+
+    End Sub
+End Class
+
